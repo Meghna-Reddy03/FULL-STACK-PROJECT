@@ -16,7 +16,7 @@ def get_tasks():
     return result.data
 
 @tasks_router.post("/tasks")
-def create_task(project_id:str,description:str,title:str,assignee:str,priority:str,status:str,due_date:str,estimated_hours:float,actual_hours:float):
+def create_task(project_id:str,description:str,title:str,assignee:str,priority:str,status:str,due_date:str,estimated_hours:float,actual_hours:float,team_member_id: str = ""):
     new_task = {
         'id':str(uuid4()),
         'description':description,
@@ -28,6 +28,7 @@ def create_task(project_id:str,description:str,title:str,assignee:str,priority:s
         'project_id':project_id,
         'estimated_hours':estimated_hours,
         'actual_hours':actual_hours,
+        'team_member_id':team_member_id,
         'created_at':datetime.now(timezone.utc).isoformat()
     }
     result = db.table('task_management_tasks').insert(new_task).execute()
@@ -43,6 +44,7 @@ def update_task(
     status: str = "",
     due_date: str = "",
     project_id:str="",
+    team_member_id: str="",
     estimated_hours:float=0.0,
     actual_hours:float=0.0
     ):
@@ -69,6 +71,8 @@ def update_task(
             update_info["actual_hours"] = actual_hours
         if project_id != "":
             update_info['project_id'] = project_id
+        if team_member_id != "":
+            update_info["team_member_id"] = team_member_id
         
         if update_info:
             updated_task = db.table('task_management_tasks').update(update_info).eq('id',task_id).execute()
